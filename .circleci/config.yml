@@ -1,5 +1,6 @@
 version: 2.1
-         
+orbs:
+  aws-cli: circleci/aws-cli@3.1         
 jobs:
   build-frontend:
     docker:
@@ -91,6 +92,49 @@ jobs:
             cd backend
             npm install
             npm audit --audit-level=critical -- true
+
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - aws-cli/setup:
+          aws-access-key-id: AWS_CLI_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_CLI_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
+      
+      - run:
+          name: install tar and gzip
+          command: |
+            yum -t install trar gzip 
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \ 
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --paramater-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople        
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \ 
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --paramater-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople        
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            aws ec2 describe-instance \
+              --filters "Name=tag:Name, Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --query 'reservations[*].Instance[*].PublicIpAddress' \
+              --output text >> .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt 
+
 workflows:
   default:
     jobs:
@@ -100,3 +144,8 @@ workflows:
           requires: [build-frontend]
        - test-backend:
           requires: [build-backend]
+       - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]
