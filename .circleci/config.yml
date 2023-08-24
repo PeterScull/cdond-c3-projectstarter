@@ -14,7 +14,6 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            echo $code
             npm install
             npm run build
       - save_cache:
@@ -32,7 +31,6 @@ jobs:
           name: Back-end build
           command: |
             cd backend
-            echo $code
             npm install
             npm run build
       - save_cache:
