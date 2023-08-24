@@ -31,6 +31,7 @@ jobs:
           name: Back-end build
           command: |
             cd backend
+            echo $code
             npm install
             npm run build
       - save_cache:
