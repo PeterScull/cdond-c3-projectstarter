@@ -164,7 +164,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_key:
-          fingerprints: ["SHA256:pxHYCnVbJbzlLtHcMXKE78eLWexThWPYR6naVkJWH+k"]
+          fingerprints: ["be:58:91:7d:ae:df:7a:2a:9b:50:7f:81:94:cb:60:9c:f8:06:85:c6"]
       - attach_workspace:
           at: ~/
       - run:
@@ -196,7 +196,11 @@ jobs:
 
       - restore_cache:
           keys: [backend-build]
-
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend
+    
     run-migrations:
       docker:
         - image: circleci/node:13.8.0
