@@ -169,7 +169,6 @@ jobs:
           at: ~/
       - run:
           name: Install dependencies
-         
           command: |
            apk add --update tar gzip ansible
            pip install awscli
@@ -206,6 +205,8 @@ jobs:
         - image: circleci/node:13.8.0
       steps:
         - checkout
+        - attach_workspace:
+          at: ~/
         - restore_cache:
             keys: [backend-build]
         - run:
@@ -223,14 +224,20 @@ jobs:
             if [$? -eq 0]; then echo "install success"; fi
             echo "MIGRATION BEGUN" > migrations_dump.txt
             npm run migrations >> migrations_dump.txt
-            cat migratiobs_dump.txt
+            cat migrations_dump.txt
         
         - run:
           name: sending to kvdb.io
           command: |   
+            if grep -q "success" ~/project/backend/migrations_dump.txt
+            then
+              echo "success"
+            else echo "fail"
+            fi
+            cd backend
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-            curl
+            curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi  
 
 
