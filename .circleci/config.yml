@@ -172,6 +172,54 @@ jobs:
           command: |
             apk add --update tar gzip ansible
             pip install awscli
+  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_key:
+          fingerprints: ["SHA256:pxHYCnVbJbzlLtHcMXKE78eLWexThWPYR6naVkJWH+k"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          # adds backend dependencies
+          command: |
+            aws cloudformation deploy \
+            -- template-file .circleci/files/backend.yml \
+            -- stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            -- parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+            -- tags project=udapeople
+            
+            --template-file .circleci/files/frontend.yml \
+            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+            --tags project=udapeople
+
+      - run:
+        name: Configure server
+        command: |
+          export ANSIBLE_HOST_KEY_CHECKING=False
+          export RECORD_HOST_KEYS=FALSE
+          export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30
+          echo ENVIROMENT=production > "backend/.env"
+          echo TYPEORM_CONNECTION=postgres>> "backend/.env"        
+          echo TYPEORM_MIGRATION_DIR=./src/modules/domain/**/*.entity.ts > "backend/.env"        
+          echo TYPEORM_PORT=$TYPEORM_PORT>> "backend/.env"        
+          echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+          echo TYPEORM_PORT=$TYPEORM_PASSWORD>> "backend/.env"	        
+          echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+          echo TYPEORM_HOST=$TYPEORM_HOST>> "backend/.env"
+          echo TYPEORM_MIGRATION=$TYPEORM_MIGRATION >> "backend/.env"
+          echo "CONTENT OF backend./env"
+          cat backend/.env
+          cd .circle/ansible
+          nisible-playbook -i inventory.txt configure-server.yml
+
+      - restore_cache:
+        keys: [backend-build]
+
 
 
 
