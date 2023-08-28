@@ -177,7 +177,7 @@ jobs:
           name: Configure server
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
-            export RECORD_HOST_KEYS=FALSE
+            export RECORD_HOST_KEYS=False
             export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30
             echo ENVIROMENT=production > "backend/.env"
             echo TYPEORM_CONNECTION=postgres >> "backend/.env"        
@@ -253,12 +253,12 @@ jobs:
       - run:
           name: Get backend url
           command: |
-          export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:project, Values=udapeople" --query 'Resurvations[*].instance[*].PublicIpAddress --output text)
-          export API_URL="http://${BACKEND_IP}:3030"
-          echo "${BACKEND_IP}
-          echo "API_URL = ${API_URL}"
-          echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-          cat frontend/.env
+            export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:UdacityProject, Values=udapeople" --query 'Resurvations[*].instance[*].PublicIpAddress --output text)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${BACKEND_IP}
+            echo "API_URL = ${API_URL}"
+            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            cat frontend/.env
       - persist_to_workspace:
           root: ~/
           paths:
