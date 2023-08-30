@@ -13,14 +13,13 @@ orbs:
           name: Revert migrations
           when: on_fail
           command: |
-            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS = 1
+            echo checking status
+            SUCCESS=$(curl --insecure  https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
               npm install
-              Add revert code here. You can find this in the Getting Started section.
-              exit 1
+              npm run migration:revert
             fi         
 jobs:
   
