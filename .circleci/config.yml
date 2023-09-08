@@ -178,7 +178,8 @@ jobs:
       steps:
         - checkout
         - add_ssh_key:
-            fingerprints: ["be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"]
+           fingerprints: 
+             - "be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"
         - attach_workspace:
             at: ~/
         - run:
@@ -215,6 +216,7 @@ jobs:
   run-migrations:
     docker:
       - image: circleci/node:13.8.0
+     #python:3.7-alpine3.11      
     steps:
       - checkout
       - attach_workspace:
@@ -290,11 +292,12 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.8-alpine3.15 
+      - image: python:3.8-alpine3.15
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"]
+          fingerprints: 
+            - "be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"
       - attach_workspace:
           at: ~/
           paths:
