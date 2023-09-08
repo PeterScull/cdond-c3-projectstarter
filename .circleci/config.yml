@@ -172,7 +172,7 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment
   
-  config-infrastructure:
+  configure-infrastructure:
       docker:
         - image: python:3.8-alpine3.15
       steps:
@@ -338,7 +338,7 @@ workflows:
           filters:
             branches:
               only: [master] 
-       - config-infrastructure:
+       - configure-infrastructure:
           requires: [deploy-infrastructure]
        - run-migrations:
           requires: [configure-infrastructure]
