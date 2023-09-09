@@ -173,45 +173,46 @@ jobs:
       - destroy-environment
   
   configure-infrastructure:
-      docker:
-        - image: python:3.8-alpine3.15
-      steps:
-        - checkout
-        - add_ssh_key:
-           fingerprints: 
-             - "be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"
-        - attach_workspace:
-            at: ~/
-        - run:
-            name: Install dependencies
-            command: | 
-              apk add --update tar gzip ansible
-              pip install awscli
-
-        - run:
-            name: Configure server
-            command: |
-              export ANSIBLE_HOST_KEY_CHECKING=False
-              export RECORD_HOST_KEYS=FALSE
-              export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30
-              echo ENVIROMENT=production > "backend/.env"
-              echo TYPEORM_CONNECTION=postgres>> "backend/.env"
-              echo TYPEORM_MIGRATION_DIR=./src/modules/domain/**/*.entity.ts > "backend/.env"
-              echo TYPEORM_PORT=$TYPEORM_PORT>> "backend/.env"
-              echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-              echo TYPEORM_PORT=$TYPEORM_PASSWORD>> "backend/.env"
-              echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-              echo TYPEORM_HOST=$TYPEORM_HOST>> "backend/.env"
-              echo TYPEORM_MIGRATION=$TYPEORM_MIGRATION >> "backend/.env"
-              echo "CONTENT OF backend./env"
-              cat backend/.env
-              cd .circle/ansible
-              anisible-playbook -i inventory.txt configure-server.yml
-    
-        - persist_to_workspace:
-            root: ~/
-            paths:
-              - projects/backend
+    docker:
+      - image: python:3.8-alpine3.15 
+      #python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update tar gzip ansible
+            pip install awscli
+      - run:
+          name: Configure server
+          command: |
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            export RECORD_HOST_KEYS=False
+            export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30
+            echo ENVIROMENT=production > "backend/.env"      
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env" 
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"    
+            echo "CONTENT OF backend/.env"      
+            cat backend/.env 
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      - restore_cache:
+          keys: [backend-build]
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/backend
   
   run-migrations:
     docker:
@@ -292,12 +293,11 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.8-alpine3.15
+      - image: python:3.8-alpine3.15 
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: 
-            - "be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"
+          fingerprints: ["be:30:ed:29:55:16:89:ff:4d:9c:d3:b7:82:2a:49:b8"]
       - attach_workspace:
           at: ~/
           paths:
@@ -322,6 +322,7 @@ jobs:
             ansible-playbook -i inventory.txt deploy-backend.yml
       - revert-migrations
       - destroy-environment
+
 
 workflows:
   default:
