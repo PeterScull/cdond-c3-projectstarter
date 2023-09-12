@@ -174,42 +174,31 @@ jobs:
   
   configure-infrastructure:
     docker:
-      - image: python:3.8-alpine3.15 
-      #python:3.7-alpine3.11
+      # Select proper image
+      - image: amazon/aws-cli:latest
     steps:
       - checkout
+      # Add the necessary SSH key fingerprint
       - add_ssh_keys:
-          fingerprints: ["60:89:d5:fe:14:ef:bf:39:56:11:e5:1b:67:4f:b2:29"]
-      - attach_workspace:
-          at: ~/
+          fingerprints:
+            - "13:f0:a0:cb:b1:3d:75:a7:cd:8b:79:0a:0b:d4:d0:66"
       - run:
           name: Install dependencies
           command: |
-            apk add --update tar gzip ansible
-            pip install awscli
+            yum update
+            yum install -y tar gzip unzip
+            yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+            yum -y install ansible
+      #Attach the workspace
+      - attach_workspace:
+          at: ~/
+      #We get the IP from the inv file and run ansible
       - run:
           name: Configure server
           command: |
-            echo ENVIRONMENT=production > backend/.env
-            echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> backend/.env
-            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> backend/.env
-            echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> backend/.env
-            echo TYPEORM_HOST=$TYPEORM_HOST >> backend/.env
-            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> backend/.env
-            echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> backend/.env
-            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> backend/.env
-            echo TYPEORM_PORT=$TYPEORM_PORT >> backend/.env
-            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> backend/.env
-            cat backend/.env                      
             cd .circleci/ansible
-            cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      - restore_cache:
-          keys: [backend-build]
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend
+      - destroy-environment      
   
   run-migrations:
     docker:
