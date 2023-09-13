@@ -173,31 +173,31 @@ jobs:
       - destroy-environment
   
   configure-infrastructure:
-    docker:
-      # Select proper image
-      - image: amazon/aws-cli:latest
-    steps:
-      - checkout
-      # Add the necessary SSH key fingerprint
-      - add_ssh_keys:
-          fingerprints:
-            - "60:89:d5:fe:14:ef:bf:39:56:11:e5:1b:67:4f:b2:29"
-      - run:
-          name: Install dependencies
-          command: |
-            yum update
-            yum install -y tar gzip unzip
-            yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-            yum -y install ansible
-      #Attach the workspace
-      - attach_workspace:
-          at: ~/
-      #We get the IP from the inv file and run ansible
-      - run:
-          name: Configure server
-          command: |
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
+      docker:
+        # Select proper image
+        - image: amazon/aws-cli:latest
+      steps:
+        - checkout
+        # Add the necessary SSH key fingerprint
+        - add_ssh_keys:
+            fingerprints:
+              - "60:89:d5:fe:14:ef:bf:39:56:11:e5:1b:67:4f:b2:29"
+        - run:
+            name: Install dependencies
+            command: |
+              yum update
+              yum install -y tar gzip unzip
+              yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+              yum -y install ansible
+        #Attach the workspace
+        - attach_workspace:
+            at: ~/
+        #We get the IP from the inv file and run ansible
+        - run:
+            name: Configure server
+            command: |
+              cd .circleci/ansible
+              ansible-playbook -i inventory.txt configure-server.yml
   
   run-migrations:
     docker:
