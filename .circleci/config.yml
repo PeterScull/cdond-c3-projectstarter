@@ -189,7 +189,7 @@ jobs:
               yum install -y tar gzip unzip
               yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
               yum -y install ansible
-              yum update
+              yum load-transaction /tmp/yum_save_tx.2023-09-13.15-19.8jzATf.yumtx
         #Attach the workspace
         - attach_workspace:
             at: ~/
