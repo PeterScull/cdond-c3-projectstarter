@@ -181,7 +181,7 @@ jobs:
         # Add the necessary SSH key fingerprint
         - add_ssh_keys:
             fingerprints:
-              - "2b:34:ae:ec:2e:7e:e2:27:36:eb:67:65:1c:a0:58:11:b0:55:ce:81"
+              - "69:1d:91:72:e5:b1:5b:d1:fb:53:df:60:0a:96:61:fb"
         - run:
             name: Install dependencies
             command: |
