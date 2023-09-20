@@ -279,7 +279,7 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.8-alpine3.15 
+      - image: amazon/aws-cli:latest
     steps:
       - checkout
       - add_ssh_keys:
