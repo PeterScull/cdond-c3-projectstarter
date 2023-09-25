@@ -211,27 +211,34 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
+          name: awscli install
+          command: |
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo ./aws/install
+      - run:
           name: Run migrations
           command: |
-            name: Run migrations
-            command: |
-              cd backend
-              npm install
-              npm run migrations > migrations_dump.txt
-              cat migrations_dump.txt
+            cd backend
+            npm install
+            
+            npm audit fix --audit-level=critical --force
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
+
+            npm audit fix --audit-level=critical --force
+            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
       - run:
           name: Send migration results to kvdb
           command: |
-            if grep -q "successfully"  ~/project/backend/migrations_dump.txt
+            if grep -q "success" ~/project/backend/migrations_dump.txt
             then
-              echo "success"
-            else echo "fail"
-            fi
-            cd backend
-            if grep "has been executed successfully" migrations_dump.txt
-            then
-              curl -k https://kvdb.io/2wKc5aL4zJjVve6Y6qjabv/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-            else curl -k https://kvdb.io/2wKc5aL4zJjVve6Y6qjabv/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '2'
+              curl --insecure https://kvdb.io/UpSvCVKsMipzyF5tpkxdPQ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
   
   deploy-frontend:
