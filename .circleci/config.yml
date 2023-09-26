@@ -203,7 +203,7 @@ jobs:
   
   run-migrations:
     docker:
-      - image: amazon/aws-cli:latest
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - attach_workspace:
