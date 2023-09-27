@@ -250,17 +250,20 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install -y tar gzip curl
-            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-            yum install -y nodejs           
+            apk update && apk upgrade --no-cache
+            apk add --update ansible
+            apk add --update tar
+            apk add --update gzip
+            pip install awscli
+            apk add --update nodejs
+            apk add --update npm
       - run:
           name: Get backend url
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances --filters "Name=tag:project,Values=udapeople" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            export API_URL="http://${BACKEND_IP}:3030"
             echo "${BACKEND_IP}"
+            export API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
-            echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
       - persist_to_workspace:
