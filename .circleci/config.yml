@@ -248,11 +248,13 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install aws-cli
-              command: |
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
+          name: awscli install
+          command: |
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo  ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
+      
       - run:
           name: Install dependencies
           command: |
@@ -293,12 +295,14 @@ jobs:
           at: ~/
           paths:
             - project/backend/.env
-      - run:      
-          name: Install aws-cli
-                command: |
-                  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                  unzip awscliv2.zip
-                  sudo ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env       
+      - run:
+          name: awscli install
+          command: |
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo  ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
+          
       - run:
           name: Install dependencies
           command: |
