@@ -246,21 +246,20 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout
-      - run:
-          name: awscli install
-          command: |
-            sudo apt install -y tar gzip curl
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip -qq awscliv2.zip
-            sudo  ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
-      
+      - checkout     
       - run:
           name: Install dependencies
           command: |
             yum install -y tar gzip curl
             curl -sL https://rpm.nodesource.com/setup_10.x | bash -
             yum install -y nodejs
+      - run:
+          name: awscli install
+          command: |
+            sudo apt install -y tar gzip curl
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip -qq awscliv2.zip
+            sudo  ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env            
       - run:
           name: Get backend url
           command: |
@@ -296,6 +295,12 @@ jobs:
           paths:
             - project/backend/.env
       - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible curl nodejs npm
+            pip install awscli
+      
+      - run:
           name: awscli install
           command: |
             sudo apt install -y tar gzip curl
@@ -303,11 +308,6 @@ jobs:
             unzip -qq awscliv2.zip
             sudo  ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
           
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible curl nodejs npm
-            pip install awscli
       - run:
           name: Deploy backend
           command: |
