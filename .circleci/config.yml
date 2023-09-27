@@ -244,9 +244,15 @@ jobs:
   
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: circleci/node:13.8.0
     steps:
       - checkout
+      - run:
+          name: Install aws-cli
+              command: |
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                sudo ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
       - run:
           name: Install dependencies
           command: |
@@ -275,12 +281,10 @@ jobs:
             npm run build
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - revert-migrations
-      - destroy-environment
 
   deploy-backend:
     docker:
-      - image: amazon/aws-cli:latest
+      - image: circleci/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
@@ -289,6 +293,12 @@ jobs:
           at: ~/
           paths:
             - project/backend/.env
+      - run:      
+          name: Install aws-cli
+                command: |
+                  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                  unzip awscliv2.zip
+                  sudo ./aws/install{TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env       
       - run:
           name: Install dependencies
           command: |
@@ -307,9 +317,6 @@ jobs:
             echo "Contents of the inventory.txt file is ---------"
             cat inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
-      - revert-migrations
-      - destroy-environment
-
 
 workflows:
   default:
