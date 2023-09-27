@@ -1,4 +1,5 @@
 version: 2.1
+
 orbs:
   aws-cli: circleci/aws-cli@3.1 
 commands:
@@ -15,7 +16,15 @@ commands:
             aws --region us-east-1 s3 rm s3://udapeople<< parameters.Workflow_ID >> --recursive
             aws --region us-east-1 cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
             aws --region us-east-1 cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.Workflow_ID >>
-
+  
+  ensure-backend-env-exists:
+    description: Add .env file due to connection problems
+    steps:
+      - run:
+          name: Create backend .env
+          command: |
+            echo -e "NODE_ENV=local\nVERSION=1\nTYPEORM_CONNECTION=${TYPEORM_CONNECTION}\nTYPEORM_MIGRATIONS_DIR=${TYPEORM_MIGRATIONS_DIR}\nTYPEORM_ENTITIES=${TYPEORM_ENTITIES}\nTYPEORM_MIGRATIONS=${TYPEORM_MIGRATIONS}\nTYPEORM_HOST=${TYPEORM_HOST}\nTYPEORM_PORT=${TYPEORM_PORT}\nTYPEORM_USERNAME=${TYPEORM_USERNAME}\nTYPEORM_PASSWORD=${TYPEORM_PASSWORD}\nTYPEORM_DATABASE=${TYPEORM_DATABASE}" >> backend/.env
+  
   revert-migrations:
     description: Revert the last migration if successfully run in the present workflow
     parameters:
@@ -208,6 +217,7 @@ jobs:
           at: ~/
       - restore_cache:
           keys: [backend-build]
+      - ensure-backend-env-exists
       - run:
           name: awscli install
           command: |
