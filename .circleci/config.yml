@@ -219,7 +219,12 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm run migrations > migrations_dump.txt
+            npm install
+            npm run migrations:revert
+            if [ $? -eq 0 ]; then echo "install success"; fi
+            echo "MIGRATIONS STARTED" > migrations_dump.txt
+            npm run migrations >> migrations_dump.txt
+            cat migrations_dump.txt
 
       - run:
           name: Send migration results to kvdb
