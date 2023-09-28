@@ -295,8 +295,8 @@ jobs:
           command: |
             apk add --update ansible curl nodejs npm
             pip install awscli
-     - create-dotenv-file
-     - run:
+            
+      - run:
           name: Configure server
           command: |    
             cd /root/project/backend/dist
