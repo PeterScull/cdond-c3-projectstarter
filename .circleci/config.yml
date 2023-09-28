@@ -295,21 +295,15 @@ jobs:
           command: |
             apk add --update ansible curl nodejs npm
             pip install awscli
-            
-      - run:
-          name: Configure server
-          command: |    
-            cd /root/project/backend/dist
-            tar czf dist.tar.gz .
-            mkdir -p ~/project/.circleci/ansible/roles/deploy/files/
-            mv dist.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
-            cd /root/project/backend/node_modules
-            tar czf node_modules.tar.gz .
-            mv node_modules.tar.gz ~/project/.circleci/ansible/roles/deploy/files/
 
       - run:
           name: Deploy backend
           command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
             echo "Contents of the inventory.txt file is ---------"
             cat inventory.txt
