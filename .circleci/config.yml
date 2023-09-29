@@ -351,7 +351,7 @@ jobs:
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
 
-cloudfront-update:
+  cloudfront-update:
     docker:
       - image: python:3.7-alpine3.11
     steps:
@@ -370,10 +370,10 @@ cloudfront-update:
           no_output_timeout: 15m
           command: |
             aws cloudformation deploy \
-             --template-file .circleci/files/cloudfront.yml \
-             --stack-name InitialStack \
-             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-             --tags project=udapeople
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
 
 
             
