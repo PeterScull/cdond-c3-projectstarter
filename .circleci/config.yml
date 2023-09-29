@@ -350,6 +350,7 @@ jobs:
           when: on_fail
           command: |
             apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+
 cloudfront-update:
     docker:
       - image: python:3.7-alpine3.11
@@ -403,4 +404,6 @@ workflows:
        - deploy-backend:
           requires: [run-migrations]
        - smoke-test:
-          requires: [deploy-frontend, deploy-backend]                
+          requires: [deploy-frontend, deploy-backend] 
+       - cloudfront-update:
+          requires: [smoke-test]              
