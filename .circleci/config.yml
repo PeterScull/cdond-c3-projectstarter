@@ -374,6 +374,36 @@ jobs:
               --stack-name InitialStack \
               --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
               --tags project=udapeople
+  
+  cleanup:
+      docker:
+        - image: amazon/aws-cli
+      steps:
+        - checkout
+        - run:
+            name: Get old stack workflow id & Remove old stack and files
+            command: |
+              export OldWorkflowID=$(aws cloudformation \
+                    list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                    --no-paginate --output text)
+              echo OldWorkflowID: "${OldWorkflowID}"
+              echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+              ## Fetch the stack names         
+              export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+                echo Stack names: "${STACKS[@]}"
+              for OldWorkflowID in "${STACKS[@]}"; do
+                if [[ $OldWorkflowID =~ "${CIRCLE_WORKFLOW_ID:0:7}" ]]
+                then
+                  echo ------ Nothing to cleanup - "Current: $OldWorkflowID" ------
+                else
+                  echo ------ Cleaning up old jobs ------
+                  export CleanUp=${OldWorkflowID: -7}
+                  echo CleanUp = ${CleanUp}
+                  aws s3 rm "s3://udapeople-${CleanUp}" --recursive
+                  aws cloudformation delete-stack --stack-name "udapeople-backend-${CleanUp}"
+                  aws cloudformation delete-stack --stack-name "udapeople-frontend-${CleanUp}"
+                fi
 
 
             
@@ -406,4 +436,6 @@ workflows:
        - smoke-test:
           requires: [deploy-frontend, deploy-backend] 
        - cloudfront-update:
-          requires: [smoke-test]              
+          requires: [smoke-test]  
+       - cleanup:
+          requires: [cloudfront-update]          
