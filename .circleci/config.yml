@@ -184,7 +184,7 @@ jobs:
   configure-infrastructure:
       docker:
         # Select proper image
-        - image: python:3.7-alpine3.11
+        - image: python:3.8-alpine3.15 
       steps:
         - checkout
         # Add the necessary SSH key fingerprint
@@ -192,7 +192,8 @@ jobs:
             fingerprints:
               - "9d:e6:cc:2f:d8:5d:a2:74:ef:08:86:ff:9c:47:b7:66"
         #Attach the workspace
-
+        - attach_workspace:
+            at: ~/            
         - run:
             name: Install Ansible
             command: |
@@ -202,12 +203,24 @@ jobs:
         - run:
             name: Run Playbook and Configure server
             command: |
-              export  ANSIBLE_HOST_KEY_CHECKING=false
-              cd .circleci/ansible
-              cat inventory.txt
-              ansible-playbook -i inventory.txt configure-server.yml \ 
-        - attach_workspace:
-            at: ~/        
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            export RECORD_HOST_KEYS=False
+            export ANSIBLE_PARAMIKO_BANNER_TIMEOUT=30
+            echo ENVIROMENT=production > "backend/.env"      
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"          
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"      
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"            
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"      
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env" 
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> "backend/.env"    
+            echo "CONTENT OF backend/.env"      
+            cat backend/.env 
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+
         - destroy-environment
   
   run-migrations:
