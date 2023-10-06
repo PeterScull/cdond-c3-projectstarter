@@ -192,8 +192,7 @@ jobs:
             fingerprints:
               - "9d:e6:cc:2f:d8:5d:a2:74:ef:08:86:ff:9c:47:b7:66"
         #Attach the workspace
-        - attach_workspace:
-            at: ~/  
+
         - run:
             name: Install Ansible
             command: |
@@ -206,7 +205,9 @@ jobs:
               export  ANSIBLE_HOST_KEY_CHECKING=false
               cd .circleci/ansible
               cat inventory.txt
-              ansible-playbook -i inventory.txt configure-server.yml \       
+              ansible-playbook -i inventory.txt configure-server.yml \ 
+        - attach_workspace:
+            at: ~/        
         - destroy-environment
   
   run-migrations:
