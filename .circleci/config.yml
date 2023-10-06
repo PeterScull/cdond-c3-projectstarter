@@ -191,22 +191,22 @@ jobs:
         - add_ssh_keys:
             fingerprints:
               - "9d:e6:cc:2f:d8:5d:a2:74:ef:08:86:ff:9c:47:b7:66"
-        - run:
-            name: Install dependencies
-            command: |
-              yum update
-              yum install -y tar gzip unzip
-              yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-              yum -y install ansible
         #Attach the workspace
         - attach_workspace:
-            at: ~/
-        #We get the IP from the inv file and run ansible
+            at: ~/  
         - run:
-            name: Configure server
+            name: Install Ansible
             command: |
+              pip install awscli
+              apk add --update ansible
+            # cat ~/project/.cicleci/ansible/configure-server.yml
+        - run:
+            name: Run Playbook and Configure server
+            command: |
+              export  ANSIBLE_HOST_KEY_CHECKING=false
               cd .circleci/ansible
-              ansible-playbook -i inventory.txt configure-server.yml              
+              cat inventory.txt
+              ansible-playbook -i inventory.txt configure-server.yml \       
         - destroy-environment
   
   run-migrations:
@@ -242,10 +242,9 @@ jobs:
           name: Send migration results to kvdb
           command: |
             cat ~/project/backend/migrations_dump.txt
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            if grep -q "has been executed successfully." ~/project/backend/migrtions_dump.txt
             then
-              echo "insecure" >> ~/.curlrc
-              curl -k https://kvdb.io/${KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+              curl https://kvdb.io/HqfEAztpuJ4xoxeFY2khCR/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi
       - destroy-environment
       - revert-migrations
