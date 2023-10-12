@@ -31,7 +31,7 @@
     "migrations:revert": "ts-node -r dotenv/config node_modules/.bin/typeorm migration:revert",
     "update:domain": "npm update @kiwihr/kiwi-domain"
   },
-  "dependencies": {
+"dependencies": {
     "@hapi/joi": "^17.1.1",
     "@nestjs/common": "^6.11.11",
     "@nestjs/core": "^6.11.11",
