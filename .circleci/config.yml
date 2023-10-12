@@ -368,7 +368,8 @@ jobs:
             else
             return 1
             fi
-
+      - destroy-environment
+      - revert-migrations
   cloudfront-update:
     docker:
       - image: python:3.7-alpine3.11
