@@ -327,7 +327,7 @@ jobs:
 
   smoke-test:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: amazon/aws-cli:latest
     steps:
       - checkout
       - run:
@@ -365,9 +365,9 @@ jobs:
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
-            return 1
-            else
             return 0
+            else
+            return 1
             fi
       - destroy-environment
       - revert-migrations
