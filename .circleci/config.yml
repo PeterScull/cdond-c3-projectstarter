@@ -334,8 +334,8 @@ jobs:
             apk add --update gzip
             pip install awscli
             apk add curl
-            # apk add --update nodejs
-            # apk add --update npm
+            apk add --update nodejs
+            apk add --update npm
 
       - attach_workspace:
           at: ~/
