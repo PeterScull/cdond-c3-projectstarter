@@ -14,7 +14,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7})
+            SUCCESS=$(curl -k https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7})
             echo "$SUCCESS"
             if [[ "${SUCCESS}" == "1" ]];
             then
@@ -304,6 +304,7 @@ jobs:
             pip install awscli
             apk add --update nodejs
             apk add --update npm
+            apk add --update openssh-client
 
       - run:
           name: Deploy backend
