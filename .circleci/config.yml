@@ -14,7 +14,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(<kvdb.txt)
+            SUCCESS=1
             echo "$SUCCESS"
             if [[ "${SUCCESS}" == "1" ]];
             then
@@ -238,10 +238,7 @@ jobs:
                 echo "insecure" >> ~/.curlrc
                 echo "insecure"
                 curl https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-                echo "https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}"  
-                cd backend
-                touch kvdb.txt
-                echo "1" > kvdb.txt          
+                echo "https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}"        
               fi
         - revert-migrations               
         - destroy-environment
