@@ -360,9 +360,9 @@ jobs:
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
-            return 0
-            else
             return 1
+            else
+            return 0
             fi
       - destroy-environment
       - revert-migrations
