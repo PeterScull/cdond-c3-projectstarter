@@ -18,7 +18,6 @@ commands:
             SUCCESS=1 
             if [[ $SUCCESS == 1 ]];
             then
-              npm install
               npm run migrations:revert
               exit 1
             fi
