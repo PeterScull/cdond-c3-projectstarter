@@ -15,14 +15,10 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(1) 
-            if [[ $SUCCESS == 1 ]];
-            then
               cd ~/project/backend
               npm install
               npm run migrations:revert
               exit 1
-            fi
             
   destroy-environment:
     parameters:
@@ -367,12 +363,13 @@ jobs:
             echo $URL
             if curl -s ${URL} | grep "Welcome"
             then
-            return 0
-            else
             return 1
+            else
+            return 0
             fi
       - destroy-environment
       - revert-migrations
+
   cloudfront-update:
     docker:
       - image: python:3.7-alpine3.11
