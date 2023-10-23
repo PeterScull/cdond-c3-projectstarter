@@ -3,21 +3,6 @@ version: 2.1
 orbs:
   aws-cli: circleci/aws-cli@3.1 
 commands:
-  destroy-environment:
-    parameters:
-      Workflow_ID:
-        type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
-    steps:
-      - run:
-          name: Destroy environment
-          when: on_fail
-          command: |
-            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}            
-  
-  
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -36,6 +21,22 @@ commands:
               npm run migrations:revert
               exit 1
             fi
+            
+  destroy-environment:
+    parameters:
+      Workflow_ID:
+        type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
+    steps:
+      - run:
+          name: Destroy environment
+          when: on_fail
+          command: |
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}            
+  
+  
 
   install_awscli:
       description: Install AWS CLI v2
@@ -244,8 +245,9 @@ jobs:
                 curl https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
                 echo "https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}"
               fi
+        - revert-migrations               
         - destroy-environment
-        - revert-migrations 
+
 
   deploy-frontend:
     docker:
