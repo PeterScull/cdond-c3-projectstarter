@@ -15,10 +15,7 @@ commands:
           when: on_fail
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-            SUCCESS=$(curl --insecure https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7})
-            echo(SUCCESS)
-            set -e
-            if [[ "$SUCCESS" = "1" ]];
+            if [[ $Working == 1 ]];
             then
               cd ~/project/backend
               npm install
@@ -26,7 +23,6 @@ commands:
               npm run migrations:revert
               exit 1
             fi
-            set -x
 
   destroy-environment:
     parameters:
@@ -246,10 +242,9 @@ jobs:
               cat ~/project/backend/migrations_dump.txt
               if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
               then
-                echo "insecure" >> ~/.curlrc
-                echo "insecure"
-                curl https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-                echo "https://kvdb.io/GjRuSz7etqxEz49MvTpbWF/migration_${CIRCLE_WORKFLOW_ID:0:7}"
+                return Working = 1
+                else
+                return Working = 0
               fi
         - revert-migrations               
         - destroy-environment
