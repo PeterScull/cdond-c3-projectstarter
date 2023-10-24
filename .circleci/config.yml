@@ -419,7 +419,7 @@ jobs:
                # else
                  # echo ------ Nothing to cleanup - "Current: $OldWorkflowID" ------
                # fi
-              done
+             # done
 
 
             
@@ -453,5 +453,5 @@ workflows:
           requires: [deploy-frontend, deploy-backend] 
        - cloudfront-update:
           requires: [smoke-test]  
-       - cleanup:
-          requires: [cloudfront-update]          
+      # - cleanup:
+       #   requires: [cloudfront-update]          
