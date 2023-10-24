@@ -189,7 +189,7 @@ jobs:
   configure-infrastructure:
       docker:
         # Select proper image
-        - image: python:3.8-alpine3.15 
+        - image: python:3.7-alpine3.11
       steps:
         - checkout
         # Add the necessary SSH key fingerprint
@@ -202,8 +202,6 @@ jobs:
         - run:
             name: Install dependencies
             command: |
-              # Your code here
-              # apk update && apk upgrade --no-cache
               apk add --update ansible
 
         - run:
