@@ -189,7 +189,7 @@ jobs:
   configure-infrastructure:
       docker:
         # Select proper image
-        - image: amazon/aws-cli:latest
+        - image: amazon/aws-cli
       steps:
         - checkout
         # Add the necessary SSH key fingerprint
