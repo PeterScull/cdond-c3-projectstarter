@@ -27,3 +27,8 @@
     cd dist
     pm2 start main.js --update-env
     sleep 60
+- name: "start server"
+  become: true
+  command: pm2 start -f ./main.js
+  args:
+    chdir: /web/ubuntu/backend/dist
