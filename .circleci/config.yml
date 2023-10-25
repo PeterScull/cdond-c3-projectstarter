@@ -189,7 +189,7 @@ jobs:
   configure-infrastructure:
       docker:
         # Select proper image
-        - image: amazon/aws-cli
+        - image: amazon/aws-cli:latest
       steps:
         - checkout
         # Add the necessary SSH key fingerprint
@@ -199,10 +199,14 @@ jobs:
         #Attach the workspace
         - attach_workspace:
             at: ~/            
+        
         - run:
             name: Install dependencies
             command: |
-              apk add --update ansible
+              yum update
+              yum install -y tar gzip unzip
+              yum -y install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+              yum -y install ansible
 
         - run:
             name: Configure server
