@@ -17,6 +17,7 @@
   become: true
   apt:
     name: ["nodejs", "npm"]
+    global: yes
     state: latest
     update_cache: yes
 
