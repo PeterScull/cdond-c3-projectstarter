@@ -145,15 +145,11 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - checkout
-      - aws-cli/setup:
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-          aws-region: AWS_DEFUALT_REGION
-      - run:
-          name: install tar and gzip
+      - checkout      
+      - run:      
+          name: Install tar and gzip
           command: |
-            yum -y install tar gzip 
+            yum -y install tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
